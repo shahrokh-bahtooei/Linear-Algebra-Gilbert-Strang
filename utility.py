@@ -41,37 +41,36 @@ class Arrow3D(FancyArrowPatch):
 
 
 def draw_xyz_axes_at_center(mpl_ax):
+
     # Compute max_lim based on plotted data
     x_lim = abs(max(mpl_ax.get_xlim(), key=abs))
     y_lim = abs(max(mpl_ax.get_ylim(), key=abs))
     z_lim = abs(max(mpl_ax.get_zlim(), key=abs))
     max_lim = max(x_lim, y_lim, z_lim)
 
-    # Position xyz axes to the center
-    mpl_ax.set_xlim(xmin=-max_lim, xmax=max_lim)
-    mpl_ax.set_ylim(ymin=-max_lim, ymax=max_lim)
-    mpl_ax.set_zlim(zmin=-max_lim, zmax=max_lim)
+    # Position xyz axes at the center
+    mpl_ax.set_xlim(-max_lim, max_lim)
+    mpl_ax.set_ylim(-max_lim, max_lim)
+    mpl_ax.set_zlim(-max_lim, max_lim)
 
     # Draw xyz axes
     axes = ['x', 'y', 'z']
-    for axis in axes:
-        start_pt = {a: -max_lim if a == axis else 0 for a in axes}
-        end_pt = {a: max_lim if a == axis else 0 for a in axes}
+    for i, axis in enumerate(axes):
+        start_end_pts = np.zeros((3, 2))
+        start_end_pts[i] = [-max_lim, max_lim]
 
         # Draw axis
-        xs = [start_pt['x'], end_pt['x']]
-        ys = [start_pt['y'], end_pt['y']]
-        zs = [start_pt['z'], end_pt['z']]
+        xs, ys, zs = start_end_pts[0], start_end_pts[1], start_end_pts[2]
 
-        a = Arrow3D(xs, ys, zs, mutation_scale=20, arrowstyle='-|>', lw=1, color='black', alpha=1)
+        a = Arrow3D(xs, ys, zs,
+                    mutation_scale=20, arrowstyle='-|>', color='black')
         mpl_ax.add_artist(a)
 
         # Add label
-        end_xyz_with_padding = np.array([end_pt['x'], end_pt['y'], end_pt['z']]) * 1.1
+        end_pt_with_padding = start_end_pts[:, 1] * 1.1
 
-        mpl_ax.text(*end_xyz_with_padding,
+        mpl_ax.text(*end_pt_with_padding,
                     axis,
                     horizontalalignment='center',
                     verticalalignment='center',
-                    color='black',
-                    alpha=1)
+                    color='black')
